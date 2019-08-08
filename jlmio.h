@@ -9,11 +9,33 @@
 #define HIGH   0x01
 #define LOW    0x00
 
+// the prescaler is set so that timer0 ticks every 64 clock cycles, and the
+// the overflow handler is called every 256 ticks.
+#define MICROSECONDS_PER_TIMER2_OVERFLOW 1024
+
+// the whole number of milliseconds per timer0 overflow
+#define MILLIS_INC (MICROSECONDS_PER_TIMER2_OVERFLOW / 1000)
+
+// the fractional number of milliseconds per timer0 overflow. we shift right
+// by three to fit these numbers into a byte. (for the clock speeds we care
+// about - 8 and 16 MHz - this doesn't lose precision.)
+#define FRACT_INC ((MICROSECONDS_PER_TIMER2_OVERFLOW % 1000) >> 3)
+#define FRACT_MAX (1000 >> 3)
+
+extern volatile unsigned long timer2_overflow_count;
+extern volatile unsigned long timer2_millis;
+
+void timer2Init();
+
+unsigned long getMillis();
+
+unsigned long getMicros();
+
 // analog read from specified analog analog pin
-extern unsigned int analog_read(unsigned char analog_pin);
+unsigned int analog_read(unsigned char analog_pin);
 
 // setup adc to use Vcc +5v internal source
-extern void adc_setup();
+void adc_setup();
 
 //Set pinmode for digital pins
 void pinMode(volatile uint8_t* pin, uint8_t position, uint8_t direction);
