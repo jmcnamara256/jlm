@@ -9,28 +9,57 @@
 #define HIGH   0x01
 #define LOW    0x00
 
-// analog read from specified analog analog pin
-extern unsigned int analog_read(unsigned char analog_pin);
+// the prescaler is set so that timer0 ticks every 64 clock cycles, and the
+// the overflow handler is called every 256 ticks.
+#define MICROSECONDS_PER_TIMER2_OVERFLOW 1024
 
-// setup adc to use Vcc +5v internal source
-extern void adc_setup();
+// the whole number of milliseconds per timer0 overflow
+#define MILLIS_INC (MICROSECONDS_PER_TIMER2_OVERFLOW / 1000)
 
-//Set pinmode for digital pins
-void pinMode(volatile uint8_t* pin, uint8_t position, uint8_t direction);
+// the fractional number of milliseconds per timer0 overflow. we shift right
+// by three to fit these numbers into a byte. (for the clock speeds we care
+// about - 8 and 16 MHz - this doesn't lose precision.)
+#define FRACT_INC ((MICROSECONDS_PER_TIMER2_OVERFLOW % 1000) >> 3)
+#define FRACT_MAX (1000 >> 3)
 
-//read digital pin values
-int readPin(volatile uint8_t* pin, uint8_t position);
+//extern volatile unsigned long timer0_overflow_count;
+//extern volatile unsigned long timer0_millis;
 
-//read write value to digital pin
-void writePin(volatile uint8_t* pin, uint8_t position,uint8_t value);
+class jlm{
+    public:
+        
+        
 
-//map values between a range
-float map(float x, float in_min, float in_max, float out_min, float out_max);
+        static void timer2Init();
 
-// restrict values between a range of values
-int constrain(float x, int lowerbound, int upperbound);
+        static unsigned long GetMillis();
 
-//check sign of value
-int sign(int x);
+        static unsigned long GetMicros();
+
+        // analog read from specified analog analog pin
+        static unsigned int analog_read(unsigned char analog_pin);
+
+        // setup adc to use Vcc +5v internal source
+        static void adc_setup();
+
+        //Set pinmode for digital pins
+        static void PinMode(volatile uint8_t* pin, uint8_t position, uint8_t direction);
+
+        //read digital pin values
+        static int ReadPin(volatile uint8_t* pin, uint8_t position);
+
+        //read write value to digital pin
+        static void WritePin(volatile uint8_t* pin, uint8_t position,uint8_t value);
+
+        //map values between a range
+        static float Map(float x, float in_min, float in_max, float out_min, float out_max);
+
+        // restrict values between a range of values
+        static int Constrain(float x, int lowerbound, int upperbound);
+
+        //check sign of value
+        static int Sign(int x);
+
+};
 
 #endif
