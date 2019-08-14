@@ -22,37 +22,44 @@
 #define FRACT_INC ((MICROSECONDS_PER_TIMER2_OVERFLOW % 1000) >> 3)
 #define FRACT_MAX (1000 >> 3)
 
-extern volatile unsigned long timer2_overflow_count;
-extern volatile unsigned long timer2_millis;
+//extern volatile unsigned long timer0_overflow_count;
+//extern volatile unsigned long timer0_millis;
 
-void timer2Init();
+class jlm{
+    public:
+        
+        
 
-unsigned long getMillis();
+        static void timer2Init();
 
-unsigned long getMicros();
+        static unsigned long GetMillis();
 
-// analog read from specified analog analog pin
-unsigned int analog_read(unsigned char analog_pin);
+        static unsigned long GetMicros();
 
-// setup adc to use Vcc +5v internal source
-void adc_setup();
+        // analog read from specified analog analog pin
+        static unsigned int analog_read(unsigned char analog_pin);
 
-//Set pinmode for digital pins
-void PinMode(volatile uint8_t* pin, uint8_t position, uint8_t direction);
+        // setup adc to use Vcc +5v internal source
+        static void adc_setup();
 
-//read digital pin values
-int ReadPin(volatile uint8_t* pin, uint8_t position);
+        //Set pinmode for digital pins
+        static void PinMode(volatile uint8_t* pin, uint8_t position, uint8_t direction);
 
-//read write value to digital pin
-void WritePin(volatile uint8_t* pin, uint8_t position,uint8_t value);
+        //read digital pin values
+        static int ReadPin(volatile uint8_t* pin, uint8_t position);
 
-//map values between a range
-float Map(float x, float in_min, float in_max, float out_min, float out_max);
+        //read write value to digital pin
+        static void WritePin(volatile uint8_t* pin, uint8_t position,uint8_t value);
 
-// restrict values between a range of values
-int Constrain(float x, int lowerbound, int upperbound);
+        //map values between a range
+        static float Map(float x, float in_min, float in_max, float out_min, float out_max);
 
-//check sign of value
-int Sign(int x);
+        // restrict values between a range of values
+        static int Constrain(float x, int lowerbound, int upperbound);
+
+        //check sign of value
+        static int Sign(int x);
+
+};
 
 #endif
