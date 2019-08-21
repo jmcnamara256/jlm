@@ -7,11 +7,7 @@ volatile unsigned long timer2_millis = 0;
 static unsigned char timer2_fract = 0;
 
 
-
 ISR(TIMER2_OVF_vect){
-	
-	
-
 	timer2_millis += MILLIS_INC; //increment past millis by precaluclated overflow value
 	timer2_fract += FRACT_INC;  //increment past micros component of timer by precaluclated overflow value
 	if (timer2_fract >= FRACT_MAX) {
@@ -20,6 +16,16 @@ ISR(TIMER2_OVF_vect){
 	}
 
 	timer2_overflow_count++; //keep track of overflows for micross calculation
+
+}
+
+TIME jlm::getTIME() {
+    TIME _TIME;
+    _TIME.SEC = (timer2_millis / 1000) % 60;
+    _TIME.MIN = (timer2_millis / 60000) % 60;
+    _TIME.HOUR = timer2_millis / 3600000;
+
+    return _TIME;
 }
 
 void jlm::timer2Init(){
@@ -29,6 +35,13 @@ void jlm::timer2Init(){
 
     TCNT2 = 0x00; //clear timer
     
+}
+
+void jlm::TMR1INIT(unsigned int TMR1_BOT) {
+    TCCR1A = 0x00;
+    TIMSK1 |= (1<<TOIE1);       // enable overflow interrupt for timer 1
+    TCCR1B = 0x01;              // prescale 1 = 16Mhz
+    TCNT1 = TMR1_BOT;           // set initial value of timer register
 }
 
 unsigned long jlm::GetMillis(){
@@ -59,6 +72,8 @@ unsigned long jlm::GetMicros(){
 	return ((m << 8) + t) * (64 / 16);
 }
 
+
+
 // analog read from specified analog analog pin
 unsigned int jlm::analog_read(unsigned char analog_pin) {
     ADMUX &= 0b11110000;        // clear ADC mux bits
@@ -70,7 +85,7 @@ unsigned int jlm::analog_read(unsigned char analog_pin) {
     }
 
     
-    return (ADCH << 2) | (ADCL);
+    return (ADCL) | (ADCH << 8);
 }
 
 // initialise the adc module
@@ -112,6 +127,10 @@ void jlm::WritePin(volatile uint8_t* pin, uint8_t position,uint8_t value){
 //map values between a range
 float jlm::Map(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+unsigned int jlm::Map(unsigned int x, unsigned int in_min, unsigned int in_max, unsigned int out_min, unsigned int out_max) {
+  return ((x - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
 }
 
 // restrict values between a range of values
